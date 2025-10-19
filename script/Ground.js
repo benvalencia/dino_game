@@ -26,4 +26,8 @@ export default class Ground {
     update(gameSpeed, frameRate) {
       this.x -= gameSpeed * frameRate * this.speed * this.scaleRatio;
     }
+    
+    reset() {
+      this.x = 0;
+    }
 }

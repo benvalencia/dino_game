@@ -61,4 +61,8 @@ export default class Cacti {
   checkCollision(dino) {
     return this.cacti.some(cactus => { return cactus.checkCollision(dino)})
   }
+
+  reset() {
+    this.cacti = [];
+  } 
 }

@@ -1,4 +1,4 @@
-import Dino from "./dino.js";
+import Dino from "./Dino.js";
 import Ground from "./Ground.js";
 import Cacti from "./Cacti.js";
 
@@ -30,6 +30,8 @@ let scaleRatio = null;
 let previousTime = null;
 let gameSpeed = GAME_SPEED_START;
 let gameOver = false;
+let hasListenerToRestart = false;
+let startFlag = true;
 
 function createSprites() {
   const dinoWidthInGame = DINO_WIDTH * scaleRatio;
@@ -119,14 +121,16 @@ function worldLoop(currentTime) {
 
   clearWorld();
 
-  if (!gameOver) {
+  if (!gameOver && !startFlag) {
     ground.update(gameSpeed, frameRate);
     cacti.update(gameSpeed, frameRate);
     dino.update(gameSpeed, frameRate);
+    updateSpeed(frameRate);
   }
   
   if (!gameOver && cacti.checkCollision(dino)) {
     gameOver = true;
+    gameReset()
   }
   
   dino.draw()
@@ -135,6 +139,10 @@ function worldLoop(currentTime) {
 
   if (gameOver) {
     showGameOver()
+  }
+  
+  if (startFlag) {
+    showStartGame()
   }
   
   requestAnimationFrame(worldLoop);
@@ -152,4 +160,44 @@ function showGameOver() {
 
 }
 
+function showStartGame() {
+  const fontSize = 40 * scaleRatio;
+  context.fillStyle = "grey";
+  context.font = `${fontSize}px Arial`;
+  context.fillText(
+    "Press Space or Tap screen to Start",
+    dino_game.width / 5 - (fontSize * 2),
+    dino_game.height / 2
+  );
+
+}
+
+function gameReset() {
+  if (!hasListenerToRestart) {
+    hasListenerToRestart = true
+    
+    setTimeout(() => {
+        window.addEventListener("keyup", reset, { once: true });
+        window.addEventListener("touchend", reset, { once: true });
+      }
+    , 500);
+  }
+}
+
+function reset() {
+  hasListenerToRestart = false; 
+  gameOver = false;
+  startFlag = false;
+  ground.reset()
+  cacti.reset()
+  gameSpeed = GAME_SPEED_START;
+}
+
+function updateSpeed(frameRate) {
+  gameSpeed += GAME_SPEED_INCREMENT * frameRate;
+}
+
 requestAnimationFrame(worldLoop);
+
+window.addEventListener("keyup", reset, { once: true });
+window.addEventListener("touchend", reset, { once: true });
