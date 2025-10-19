@@ -57,4 +57,8 @@ export default class Cacti {
   getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   }
+
+  checkCollision(dino) {
+    return this.cacti.some(cactus => { return cactus.checkCollision(dino)})
+  }
 }

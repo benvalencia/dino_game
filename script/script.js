@@ -29,6 +29,7 @@ let cacti = null;
 let scaleRatio = null;
 let previousTime = null;
 let gameSpeed = GAME_SPEED_START;
+let gameOver = false;
 
 function createSprites() {
   const dinoWidthInGame = DINO_WIDTH * scaleRatio;
@@ -118,15 +119,37 @@ function worldLoop(currentTime) {
 
   clearWorld();
 
-  ground.update(gameSpeed, frameRate);
-  cacti.update(gameSpeed, frameRate);
-  dino.update(gameSpeed, frameRate);
-
+  if (!gameOver) {
+    ground.update(gameSpeed, frameRate);
+    cacti.update(gameSpeed, frameRate);
+    dino.update(gameSpeed, frameRate);
+  }
+  
+  if (!gameOver && cacti.checkCollision(dino)) {
+    gameOver = true;
+  }
+  
   dino.draw()
   cacti.draw();
   ground.draw()
 
+  if (gameOver) {
+    showGameOver()
+  }
+  
   requestAnimationFrame(worldLoop);
+}
+
+function showGameOver() {
+  const fontSize = 40 * scaleRatio;
+  context.fillStyle = "grey";
+  context.font = `${fontSize}px Arial`;
+  context.fillText(
+    "Game Over",
+    dino_game.width / 2.1 - (fontSize * 2),
+    dino_game.height / 2
+  );
+
 }
 
 requestAnimationFrame(worldLoop);

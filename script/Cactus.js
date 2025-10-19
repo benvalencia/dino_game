@@ -15,4 +15,17 @@ export default class Cactus {
   draw() {
     this.context.drawImage(this.image, this.x, this.y, this.width, this.height);
   }
+
+  checkCollision(dino) {
+    const near = 1.4;
+    if (
+      dino.x < this.x + this.width / near &&
+      dino.x + dino.width / near > this.x &&
+      dino.y < this.y + this.height / near &&
+      dino.y + dino.height / near > this.y
+    ) {
+      return true;
+    }
+    return false;
+  }
 }
