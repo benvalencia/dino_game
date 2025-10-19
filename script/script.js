@@ -1,6 +1,7 @@
 import Dino from "./Dino.js";
 import Ground from "./Ground.js";
 import Cacti from "./Cacti.js";
+import Score from "./Score.js";
 
 const dino_game = document.getElementById("dino_game");
 const context = dino_game.getContext("2d");
@@ -26,6 +27,7 @@ const CACTI_CONFIG = [
 let dino = null;
 let ground = null;
 let cacti = null;
+let score = null;
 let scaleRatio = null;
 let previousTime = null;
 let gameSpeed = GAME_SPEED_START;
@@ -69,6 +71,8 @@ function createSprites() {
   })
   
   cacti = new Cacti(context, cactiImage, scaleRatio, GROUND_AND_CACTUS_SPEED);
+  
+  score = new Score(context, scaleRatio);
 }
 
 function setScreen() {
@@ -125,17 +129,20 @@ function worldLoop(currentTime) {
     ground.update(gameSpeed, frameRate);
     cacti.update(gameSpeed, frameRate);
     dino.update(gameSpeed, frameRate);
+    score.update(frameRate);
     updateSpeed(frameRate);
   }
   
   if (!gameOver && cacti.checkCollision(dino)) {
     gameOver = true;
     gameReset()
+    score.setHighScore()
   }
   
   dino.draw()
   cacti.draw();
   ground.draw()
+  score.draw();
 
   if (gameOver) {
     showGameOver()
@@ -190,6 +197,7 @@ function reset() {
   startFlag = false;
   ground.reset()
   cacti.reset()
+  score.reset()
   gameSpeed = GAME_SPEED_START;
 }
 
