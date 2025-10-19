@@ -73,6 +73,11 @@ export default class Dino {
 
   update(gameSpeed, frameRate) {
     this.run(gameSpeed, frameRate);
+    
+    if (this.isJumping) {
+      this.image = this.standingStillImage;
+    }
+    
     this.jump(frameRate)
   }
   

@@ -1,5 +1,6 @@
 import Dino from "./dino.js";
 import Ground from "./Ground.js";
+import Cacti from "./Cacti.js";
 
 const dino_game = document.getElementById("dino_game");
 const context = dino_game.getContext("2d");
@@ -16,11 +17,17 @@ const MIN_JUMP_HEIGHT = 150;
 const GROUND_WIDTH = 2400;
 const GROUND_HEIGHT = 24;
 const GROUND_AND_CACTUS_SPEED = .5;
-
+const CACTI_CONFIG = [
+  { width: 48 / 1.5, height: 100 / 1.5, imageSrc: './images/cactus_1.png' },
+  { width: 98 / 1.5, height: 100 / 1.5, imageSrc: './images/cactus_2.png' },
+  { width: 68 / 1.5, height: 70 / 1.5, imageSrc: './images/cactus_3.png' },
+];
+  
 let dino = null;
 let ground = null;
+let cacti = null;
 let scaleRatio = null;
-let previousTime = null;  
+let previousTime = null;
 let gameSpeed = GAME_SPEED_START;
 
 function createSprites() {
@@ -30,7 +37,7 @@ function createSprites() {
   const maxJumpHeightInGame = MAX_JUMP_HEIGHT * scaleRatio;
   const groundWidthInGame = GROUND_WIDTH * scaleRatio;
   const groundHeightInGame = GROUND_HEIGHT * scaleRatio;
-  
+
   dino = new Dino(
     context,
     dinoWidthInGame,
@@ -46,12 +53,24 @@ function createSprites() {
     groundHeightInGame,
     GROUND_AND_CACTUS_SPEED,
     scaleRatio
-  )
+  );
+  
+  const cactiImage = CACTI_CONFIG.map((cactus) => {
+    const image = new Image();
+    image.src = cactus.imageSrc;
+    return {
+      image,
+      width: cactus.width * scaleRatio,
+      height: cactus.height * scaleRatio
+    };
+  })
+  
+  cacti = new Cacti(context, cactiImage, scaleRatio, GROUND_AND_CACTUS_SPEED);
 }
 
 function setScreen() {
   scaleRatio = getScaleRatio();
-  
+
   dino_game.width = WORLD_WIDTH * scaleRatio;
   dino_game.height = WORLD_HEIGHT * scaleRatio;
   createSprites()
@@ -70,21 +89,20 @@ function getScaleRatio() {
     window.innerWidth,
     document.documentElement.clientWidth
   );
-  
+
   const screenHeight = Math.min(
     window.innerHeight,
     document.documentElement.clientHeight
   );
 
-  if (screenWidth / screenHeight < WORLD_WIDTH / WORLD_HEIGHT ) {
+  if (screenWidth / screenHeight < WORLD_WIDTH / WORLD_HEIGHT) {
     return screenWidth / WORLD_WIDTH;
   } else {
     return screenHeight / WORLD_HEIGHT;
   }
-  
 }
 
-function clearWorld() { 
+function clearWorld() {
   context.fillStyle = "#fff";
   context.fillRect(0, 0, dino_game.width, dino_game.height);
 }
@@ -97,15 +115,17 @@ function worldLoop(currentTime) {
   }
   const frameRate = currentTime - previousTime;
   previousTime = currentTime;
-  
+
   clearWorld();
-  
+
   ground.update(gameSpeed, frameRate);
+  cacti.update(gameSpeed, frameRate);
   dino.update(gameSpeed, frameRate);
 
   dino.draw()
+  cacti.draw();
   ground.draw()
-  
+
   requestAnimationFrame(worldLoop);
 }
 
